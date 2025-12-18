@@ -7,46 +7,58 @@
 <title>AI Agent Workflow Builder</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui;display:flex;height:100vh;background:#f8f9fa}
-#left{width:350px;background:#fff;padding:25px;overflow-y:auto;border-right:2px solid #e9ecef}
-#right{flex:1;padding:40px;overflow-y:auto;background:#f8f9fa}
-h2{font-size:20px;margin-bottom:20px;color:#212529}
-.workflow{margin-bottom:25px;padding:20px;background:#fff;border-radius:8px;border:1px solid #dee2e6}
-.workflow input{width:100%;padding:10px;margin-bottom:12px;border:2px solid #dee2e6;border-radius:4px;font-size:14px}
-.workflow input:focus{outline:none;border-color:#6366f1}
-.step-container{margin-top:15px}
-.step{background:#f8f9fa;padding:12px;margin-bottom:8px;border-radius:4px;display:flex;gap:8px}
-.step input{margin:0;flex:1;background:#fff}
-.step button{padding:8px 12px;background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px}
-button{padding:12px 20px;background:#6366f1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:14px;width:100%}
-button:hover{background:#4f46e5}
-.add-step{background:#10b981;margin-top:8px}
-.add-step:hover{background:#059669}
-.add-workflow{background:#8b5cf6;margin-top:15px}
-.add-workflow:hover{background:#7c3aed}
-.remove-workflow{background:#ef4444;margin-top:8px;padding:8px}
-.remove-workflow:hover{background:#dc2626}
-.flow-item{display:flex;align-items:center;margin-bottom:30px}
-.flow-label{min-width:200px;font-weight:600;color:#495057;font-size:16px}
-.flow-num{font-size:32px;font-weight:bold;color:#adb5bd;margin-right:20px}
-.flow-steps{display:flex;gap:15px;align-items:center;flex-wrap:wrap}
-.box{padding:15px 20px;border-radius:8px;border:2px solid;font-size:14px;font-weight:500;min-width:120px;text-align:center}
-.arrow{font-size:24px;color:#adb5bd}
+body{font-family:system-ui;background:#f8f9fa}
+#container{max-width:100%;margin:0 auto}
+#left{padding:20px;background:#fff;border-bottom:3px solid #e9ecef}
+#right{padding:20px;min-height:400px}
+h2{font-size:18px;margin-bottom:15px;color:#212529}
+.workflow{margin-bottom:20px;padding:15px;background:#f8f9fa;border-radius:8px;border:2px solid #dee2e6}
+.workflow>input{width:100%;padding:12px;margin-bottom:12px;border:2px solid #dee2e6;border-radius:6px;font-size:15px;font-weight:600}
+.workflow>input:focus{outline:none;border-color:#6366f1}
+.step{margin-bottom:10px;display:flex;gap:8px;align-items:stretch}
+.step input{flex:1;padding:12px;border:2px solid #dee2e6;border-radius:6px;font-size:14px;min-height:44px}
+.step input:focus{outline:none;border-color:#6366f1}
+.step button{width:44px;height:44px;background:#ef4444;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:20px;font-weight:bold;flex-shrink:0}
+button{padding:12px;background:#6366f1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:14px;width:100%;margin-top:8px}
+button:hover{opacity:0.9}
+.add-step{background:#10b981}
+.add-workflow{background:#8b5cf6}
+.remove-workflow{background:#ef4444}
+.gen-btn{background:#6366f1;font-size:16px;padding:15px;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.flow-item{margin-bottom:35px;background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
+.flow-header{display:flex;align-items:center;margin-bottom:20px;gap:15px}
+.flow-num{font-size:28px;font-weight:bold;color:#adb5bd;min-width:40px}
+.flow-label{font-weight:600;color:#495057;font-size:16px;flex:1}
+.flow-steps{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.box{padding:12px 16px;border-radius:8px;border:2px solid;font-size:13px;font-weight:500;min-width:100px;text-align:center;word-break:break-word}
+.arrow{font-size:20px;color:#adb5bd;user-select:none}
 .trigger{background:#fef3c7;border-color:#f59e0b;color:#92400e}
 .action{background:#dbeafe;border-color:#3b82f6;color:#1e40af}
 .check{background:#d1fae5;border-color:#10b981;color:#065f46}
 .ai{background:#f3e8ff;border-color:#a855f7;color:#6b21a8}
 .final{background:#d1fae5;border-color:#10b981;color:#065f46}
+#download{background:#059669;margin-top:15px}
+.empty{text-align:center;color:#adb5bd;padding:60px 20px;font-size:16px}
+@media(min-width:768px){
+#container{display:flex;height:100vh}
+#left{width:400px;border-bottom:none;border-right:3px solid #e9ecef;overflow-y:auto}
+#right{flex:1;overflow-y:auto}
+.box{font-size:14px;padding:14px 18px}
+}
 </style>
 </head>
 <body>
+<div id="container">
 <div id="left">
 <h2>AI Agent Workflows</h2>
 <div id="workflows"></div>
 <button class="add-workflow" onclick="addWorkflow()">+ Add Workflow</button>
-<button onclick="generate()" style="margin-top:15px">Generate Diagram</button>
+<button class="gen-btn" onclick="generate()">Generate Diagram</button>
 </div>
-<div id="right" id="output"></div>
+<div id="right">
+<div class="empty">Add workflows and click Generate to see your diagram</div>
+</div>
+</div>
 
 <script>
 let workflows=[];
@@ -86,14 +98,12 @@ const c=document.getElementById('workflows');
 c.innerHTML=workflows.map((w,wi)=>`
 <div class="workflow">
 <input placeholder="Workflow Name (e.g., Create CRM Entry)" value="${w.name}" oninput="updateName(${wi},this.value)">
-<div class="step-container">
 ${w.steps.map((s,si)=>`
 <div class="step">
-<input placeholder="Step ${si+1} (e.g., Payment)" value="${s}" oninput="updateStep(${wi},${si},this.value)">
+<input placeholder="Step ${si+1}" value="${s}" oninput="updateStep(${wi},${si},this.value)">
 <button onclick="removeStep(${wi},${si})">×</button>
 </div>
 `).join('')}
-</div>
 <button class="add-step" onclick="addStep(${wi})">+ Add Step</button>
 <button class="remove-workflow" onclick="removeWorkflow(${wi})">Remove Workflow</button>
 </div>
@@ -110,10 +120,17 @@ return 'action';
 
 function generate(){
 const out=document.getElementById('right');
-out.innerHTML=workflows.map((w,i)=>`
+if(workflows.length===0||workflows.every(w=>!w.steps.some(s=>s.trim()))){
+out.innerHTML='<div class="empty">Add workflows and steps to generate diagram</div>';
+return;
+}
+out.innerHTML=`
+${workflows.map((w,i)=>`
 <div class="flow-item">
+<div class="flow-header">
 <div class="flow-num">${i+1}</div>
 <div class="flow-label">${w.name||'Workflow '+(i+1)}</div>
+</div>
 <div class="flow-steps">
 ${w.steps.filter(s=>s.trim()).map((s,si,arr)=>`
 <div class="box ${getStepClass(s,si,arr.length)}">${s}</div>
@@ -121,11 +138,25 @@ ${si<arr.length-1?'<div class="arrow">→</div>':''}
 `).join('')}
 </div>
 </div>
-`).join('');
+`).join('')}
+<button id="download" onclick="downloadImg()">Download as Image</button>
+`;
+}
+
+function downloadImg(){
+const el=document.getElementById('right');
+html2canvas(el,{backgroundColor:'#f8f9fa',scale:2}).then(canvas=>{
+const link=document.createElement('a');
+link.download='workflow-diagram.png';
+link.href=canvas.toDataURL();
+link.click();
+});
 }
 
 addWorkflow();
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 </body>
 </html>
