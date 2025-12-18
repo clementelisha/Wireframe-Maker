@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Workflow Builder</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui;display:flex;height:100vh;background:#f8f9fa}
+#left{width:350px;background:#fff;padding:25px;overflow-y:auto;border-right:2px solid #e9ecef}
+#right{flex:1;padding:40px;overflow-y:auto;background:#f8f9fa}
+h2{font-size:20px;margin-bottom:20px;color:#212529}
+.workflow{margin-bottom:25px;padding:20px;background:#fff;border-radius:8px;border:1px solid #dee2e6}
+.workflow input{width:100%;padding:10px;margin-bottom:12px;border:2px solid #dee2e6;border-radius:4px;font-size:14px}
+.workflow input:focus{outline:none;border-color:#6366f1}
+.step-container{margin-top:15px}
+.step{background:#f8f9fa;padding:12px;margin-bottom:8px;border-radius:4px;display:flex;gap:8px}
+.step input{margin:0;flex:1;background:#fff}
+.step button{padding:8px 12px;background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px}
+button{padding:12px 20px;background:#6366f1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:14px;width:100%}
+button:hover{background:#4f46e5}
+.add-step{background:#10b981;margin-top:8px}
+.add-step:hover{background:#059669}
+.add-workflow{background:#8b5cf6;margin-top:15px}
+.add-workflow:hover{background:#7c3aed}
+.remove-workflow{background:#ef4444;margin-top:8px;padding:8px}
+.remove-workflow:hover{background:#dc2626}
+.flow-item{display:flex;align-items:center;margin-bottom:30px}
+.flow-label{min-width:200px;font-weight:600;color:#495057;font-size:16px}
+.flow-num{font-size:32px;font-weight:bold;color:#adb5bd;margin-right:20px}
+.flow-steps{display:flex;gap:15px;align-items:center;flex-wrap:wrap}
+.box{padding:15px 20px;border-radius:8px;border:2px solid;font-size:14px;font-weight:500;min-width:120px;text-align:center}
+.arrow{font-size:24px;color:#adb5bd}
+.trigger{background:#fef3c7;border-color:#f59e0b;color:#92400e}
+.action{background:#dbeafe;border-color:#3b82f6;color:#1e40af}
+.check{background:#d1fae5;border-color:#10b981;color:#065f46}
+.ai{background:#f3e8ff;border-color:#a855f7;color:#6b21a8}
+.final{background:#d1fae5;border-color:#10b981;color:#065f46}
+</style>
+</head>
+<body>
+<div id="left">
+<h2>AI Agent Workflows</h2>
+<div id="workflows"></div>
+<button class="add-workflow" onclick="addWorkflow()">+ Add Workflow</button>
+<button onclick="generate()" style="margin-top:15px">Generate Diagram</button>
+</div>
+<div id="right" id="output"></div>
+
+<script>
+let workflows=[];
+
+function addWorkflow(){
+workflows.push({name:'',steps:['','']});
+render();
+}
+
+function removeWorkflow(i){
+workflows.splice(i,1);
+render();
+}
+
+function addStep(wi){
+workflows[wi].steps.push('');
+render();
+}
+
+function removeStep(wi,si){
+if(workflows[wi].steps.length>1){
+workflows[wi].steps.splice(si,1);
+render();
+}
+}
+
+function updateName(wi,val){
+workflows[wi].name=val;
+}
+
+function updateStep(wi,si,val){
+workflows[wi].steps[si]=val;
+}
+
+function render(){
+const c=document.getElementById('workflows');
+c.innerHTML=workflows.map((w,wi)=>`
+<div class="workflow">
+<input placeholder="Workflow Name (e.g., Create CRM Entry)" value="${w.name}" oninput="updateName(${wi},this.value)">
+<div class="step-container">
+${w.steps.map((s,si)=>`
+<div class="step">
+<input placeholder="Step ${si+1} (e.g., Payment)" value="${s}" oninput="updateStep(${wi},${si},this.value)">
+<button onclick="removeStep(${wi},${si})">×</button>
+</div>
+`).join('')}
+</div>
+<button class="add-step" onclick="addStep(${wi})">+ Add Step</button>
+<button class="remove-workflow" onclick="removeWorkflow(${wi})">Remove Workflow</button>
+</div>
+`).join('');
+}
+
+function getStepClass(step,idx,total){
+if(idx===0)return 'trigger';
+if(idx===total-1)return 'final';
+if(step.toLowerCase().includes('check')||step.toLowerCase().includes('daily'))return 'check';
+if(step.toLowerCase().includes('ai')||step.toLowerCase().includes('agent'))return 'ai';
+return 'action';
+}
+
+function generate(){
+const out=document.getElementById('right');
+out.innerHTML=workflows.map((w,i)=>`
+<div class="flow-item">
+<div class="flow-num">${i+1}</div>
+<div class="flow-label">${w.name||'Workflow '+(i+1)}</div>
+<div class="flow-steps">
+${w.steps.filter(s=>s.trim()).map((s,si,arr)=>`
+<div class="box ${getStepClass(s,si,arr.length)}">${s}</div>
+${si<arr.length-1?'<div class="arrow">→</div>':''}
+`).join('')}
+</div>
+</div>
+`).join('');
+}
+
+addWorkflow();
+</script>
+
+</body>
+</html>
